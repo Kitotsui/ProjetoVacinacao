@@ -21,11 +21,14 @@ import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxLocation;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxLocation;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
+import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxTriggerAfterSwap;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import web.controlevacinacao.filter.VacinaFilter;
 import web.controlevacinacao.model.Status;
 import web.controlevacinacao.model.Vacina;
+import web.controlevacinacao.notificacao.NotificacaoSweetAlert2;
+import web.controlevacinacao.notificacao.TipoNotificaoSweetAlert2;
 import web.controlevacinacao.pagination.PageWrapper;
 import web.controlevacinacao.repository.VacinaRepository;
 import web.controlevacinacao.service.VacinaService;
@@ -97,10 +100,11 @@ public class VacinaController {
     }
 
     @HxRequest
+    @HxTriggerAfterSwap("htmlAtualizado")
     @GetMapping("/sucesso")
-    public String abrirMensagemSucessoHTMX(Model model) {
-        model.addAttribute("mensagem", "Vacina cadastrada com sucesso");
-        return "mensagem :: texto";
+    public String abrirMensagemSucessoHTMX(Vacina vacina, Model model) {
+        model.addAttribute("notificacao", new NotificacaoSweetAlert2("Vacina cadastrada com sucesso!", TipoNotificaoSweetAlert2.SUCCESS, 4000));
+        return "vacinas/cadastro :: formulario";
     }
 
     @GetMapping("/abrirpesquisar")
@@ -126,6 +130,7 @@ public class VacinaController {
     }
 
     @HxRequest
+    @HxTriggerAfterSwap("htmlAtualizado")
     @GetMapping("/pesquisar")
     public String pesquisarHTMX(VacinaFilter filtro, Model model,
             @PageableDefault(size = 7) @SortDefault(sort = "codigo", direction = Sort.Direction.ASC) Pageable pageable,
@@ -161,6 +166,15 @@ public class VacinaController {
     }
 
     @HxRequest
+    @HxTriggerAfterSwap("htmlAtualizado")
+    @GetMapping("/sucesso2")
+    public String abrirMensagemSucesso2HTMX(Model model) {
+        model.addAttribute("notificacao", new NotificacaoSweetAlert2("Vacina alterada com sucesso!", TipoNotificaoSweetAlert2.SUCCESS, 4000));
+        return "vacinas/pesquisar :: formulario";
+    }
+
+
+    @HxRequest
     @PostMapping("/alterar")
     public String alterarHTMX(@Valid Vacina vacina, BindingResult resultado, HtmxResponse.Builder htmxResponse) {
         if (resultado.hasErrors()) {
@@ -180,23 +194,16 @@ public class VacinaController {
         }
     }
 
-    @HxRequest
-    @GetMapping("/sucesso2")
-    public String abrirMensagemSucesso2HTMX(Model model) {
-        model.addAttribute("mensagem", "Vacina alterada com sucesso");
-        return "mensagem :: texto";
-    }
+    // @PostMapping("/confirmarremocao")
+    // public String confirmarRemocao(Vacina vacina) {
+    //     return "vacinas/confirmarremocao";
+    // }
 
-    @PostMapping("/confirmarremocao")
-    public String confirmarRemocao(Vacina vacina) {
-        return "vacinas/confirmarremocao";
-    }
-
-    @HxRequest
-    @PostMapping("/confirmarremocao")
-    public String abrirRemoverHTMX(Vacina vacina) {
-        return "vacinas/confirmarremocao :: confirmacao";
-    }
+    // @HxRequest
+    // @PostMapping("/confirmarremocao")
+    // public String abrirRemoverHTMX(Vacina vacina) {
+    //     return "vacinas/confirmarremocao :: confirmacao";
+    // }
 
     @PostMapping("/remover")
     public String remover(Vacina vacina) {
@@ -221,10 +228,11 @@ public class VacinaController {
     }
 
     @HxRequest
+    @HxTriggerAfterSwap("htmlAtualizado")
     @GetMapping("/sucesso3")
     public String abrirMensagemSucesso3HTMX(Model model) {
-        model.addAttribute("mensagem", "Vacina removida com sucesso");
-        return "mensagem :: texto";
+        model.addAttribute("notificacao", new NotificacaoSweetAlert2("Vacina removida com sucesso!", TipoNotificaoSweetAlert2.SUCCESS, 4000));
+        return "vacinas/pesquisar :: formulario";
     }
 
 }
